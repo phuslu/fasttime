@@ -1,4 +1,4 @@
-# fasttime - fast strftime for go
+# fasttime - fast time formatting for go
 
 [![godoc][godoc-img]][godoc] [![release][release-img]][release] [![goreport][goreport-img]][goreport] [![coverage][coverage-img]][coverage]
 
@@ -15,15 +15,21 @@ import (
 )
 
 func main() {
+	println(fasttime.Timestamp()))
 	println(fasttime.Strftime("%a %b %d %H:%M:%S %Z %Y", time.Now()))
 }
 
+// 1608220004
 // Thu Dec 17 10:49:04 +08 2020
 ```
 
 ## Benchmarks
 ```
-BenchmarkPhuslu-16         	 5436151	       140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStdTimeFormat  	 4373617	       270 ns/op	      32 B/op	       1 allocs/op
+BenchmarkFastTimeFormat 	12896657	        95 ns/op	       0 B/op	       0 allocs/op
+
+BenchmarkStdTimestamp   	 1507666	       802 ns/op	      16 B/op	       1 allocs/op
+BenchmarkFastTimestamp  	 3189529	       382 ns/op	       0 B/op	       0 allocs/op
 ```
 
 ## Supported formats:
@@ -37,7 +43,7 @@ BenchmarkPhuslu-16         	 5436151	       140 ns/op	       0 B/op	       0 all
 | `%c` | The preferred date and time representation for the current locale. |
 | `%C` | The century number (year/100) as a 2-digit integer. |
 | `%d` | The day of the month as a decimal number (range 01 to 31). |
-| `%D` | Equivalent to %m/%d/%y.  (Yecch—for Americans only.  Americans should note that in other countries %d/%m/%y is rather common.  This means that in international context this format is ambiguous and should not be used.) |
+| `%D` | Equivalent to %m/%d/%y.  (Yecch—for Americans only.) |
 | `%e` | Like %d, the day of the month as a decimal number, but a leading zero is replaced by a space. |
 | `%F` | Equivalent to %Y-%m-%d (the ISO 8601 date format). |
 | `%G` | The  ISO 8601 week-based year (see NOTES) with century as a decimal number.  The 4-digit year corresponding to the ISO week number (see %V).  This has the same format and value as %Y, except that if the ISO week number belongs to the previous or next year, that year is used instead. |

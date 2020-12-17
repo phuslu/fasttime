@@ -62,7 +62,13 @@ func TestStrftime(t *testing.T) {
 	}
 }
 
-func BenchmarkISOTime(b *testing.B) {
+func BenchmarkStdTimeFormat(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		now.Format("2006-01-02 15:04:05")
+	}
+}
+
+func BenchmarkFastTimeFormat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Strftime("%Y-%m-%d %H:%M:%S", now)
 	}
