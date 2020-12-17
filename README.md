@@ -24,12 +24,49 @@ func main() {
 ```
 
 ## Benchmarks
-```
-BenchmarkStdTimeFormat  	 4373617	       270 ns/op	      32 B/op	       1 allocs/op
-BenchmarkFastTimeFormat 	12896657	        95 ns/op	       0 B/op	       0 allocs/op
 
-BenchmarkStdTimestamp   	 1507666	       802 ns/op	      16 B/op	       1 allocs/op
-BenchmarkFastTimestamp  	 3189529	       382 ns/op	       0 B/op	       0 allocs/op
+```go
+// go test -v -cpu=4 -run=none -bench=. -benchmem strftime_test.go
+package strftime_test
+
+import (
+	"io/ioutil"
+	"testing"
+	"time"
+
+	itchyny "github.com/itchyny/timefmt-go"
+	lestrrat "github.com/lestrrat-go/strftime"
+	fasttime "github.com/phuslu/fasttime"
+)
+
+const benchfmt = `%a %b %e %H:%M:%S %Z %Y`
+
+var now = time.Now()
+
+func BenchmarkLestrrat(b *testing.B) {
+	p, _ := lestrrat.New(benchfmt)
+	for i := 0; i < b.N; i++ {
+		p.Format(ioutil.Discard, now)
+	}
+}
+
+func BenchmarkItchyny(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		itchyny.Format(now, benchfmt)
+	}
+}
+
+func BenchmarkFasttime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		fasttime.Strftime(benchfmt, now)
+	}
+}
+```
+
+```
+BenchmarkLestrrat 	 2092376	       583 ns/op	      64 B/op	       1 allocs/op
+BenchmarkItchyny  	 2787598	       430 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFasttime 	 3440578	       342 ns/op	       0 B/op	       0 allocs/op
 ```
 
 ## Supported formats:
