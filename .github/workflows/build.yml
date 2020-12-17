@@ -1,0 +1,17 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: |
+          git clone https://github.com/${GITHUB_REPOSITORY}
+          cd $(basename ${GITHUB_REPOSITORY})
+          go build -v
+          go test -v
