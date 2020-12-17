@@ -3,14 +3,11 @@ package fasttime
 import (
 	"strconv"
 	"time"
-	"unsafe"
 )
 
 // Strftime formats time t using format.
 func Strftime(format string, t time.Time) string {
-	b := make([]byte, 0, 64)
-	b = appendTime(b, format, t)
-	return *(*string)(unsafe.Pointer(&b))
+	return string(appendTime(make([]byte, 0, 64), format, t))
 }
 
 func appendTime(dst []byte, format string, t time.Time) []byte {

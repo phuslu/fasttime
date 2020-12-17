@@ -1,16 +1,10 @@
 package fasttime
 
-import (
-	"unsafe"
-)
-
 func Timestamp() string {
-	b := make([]byte, 10)
-	timestamp(b)
-	return *(*string)(unsafe.Pointer(&b))
+	return string(timestamp(make([]byte, 10)))
 }
 
-func timestamp(b []byte) {
+func timestamp(b []byte) []byte {
 	sec, _ := walltime()
 	a := sec % 100 * 2
 	sec /= 100
@@ -31,6 +25,7 @@ func timestamp(b []byte) {
 	a = sec % 100 * 2
 	b[1] = tab[a+1]
 	b[0] = tab[a]
+	return b
 }
 
 const tab = "00010203040506070809" +
