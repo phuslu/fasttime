@@ -8,10 +8,11 @@ import (
 
 // Strftime formats time t using format.
 func Strftime(format string, t time.Time) string {
-	return string(appendTime(make([]byte, 0, 64), format, t))
+	return string(AppendStrftime(make([]byte, 0, 64), format, t))
 }
 
-func appendTime(dst []byte, format string, t time.Time) []byte {
+// AppendStrftime appends time t using format.
+func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 	n := len(format)
 	if n == 0 {
 		return dst
@@ -121,17 +122,17 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 						dst = append(dst, "PM"...)
 					}
 				case 'r':
-					dst = appendTime(dst, "%I:%M:%S ", t)
+					dst = AppendStrftime(dst, "%I:%M:%S ", t)
 					if hour <= 12 {
 						dst = append(dst, "am"...)
 					} else {
 						dst = append(dst, "pm"...)
 					}
 				case 'x':
-					b := appendTime(nil, dateFormat, t)
+					b := AppendStrftime(nil, dateFormat, t)
 					dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
 				case 'X':
-					b := appendTime(nil, timeFormat, t)
+					b := AppendStrftime(nil, timeFormat, t)
 					dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
 				case 'Z':
 					name, _ := t.Zone()
@@ -164,17 +165,17 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 						dst = append(dst, "PM"...)
 					}
 				case 'r':
-					dst = appendTime(dst, "%I:%M:%S ", t)
+					dst = AppendStrftime(dst, "%I:%M:%S ", t)
 					if hour <= 12 {
 						dst = append(dst, "am"...)
 					} else {
 						dst = append(dst, "pm"...)
 					}
 				case 'x':
-					b := appendTime(nil, dateFormat, t)
+					b := AppendStrftime(nil, dateFormat, t)
 					dst = appendSwapcase(dst, *(*string)(unsafe.Pointer(&b)))
 				case 'X':
-					b := appendTime(nil, timeFormat, t)
+					b := AppendStrftime(nil, timeFormat, t)
 					dst = appendSwapcase(dst, *(*string)(unsafe.Pointer(&b)))
 				case 'Z':
 					name, _ := t.Zone()
@@ -189,14 +190,14 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 			case 'B':
 				dst = append(dst, month.String()...)
 			case 'c':
-				dst = appendTime(dst, "%a %b %e %H:%M:%S %Y", t)
+				dst = AppendStrftime(dst, "%a %b %e %H:%M:%S %Y", t)
 			case 'C':
 				a := year / 100 * 2
 				dst = append(dst, tab[a], tab[a+1])
 			case 'd':
 				dst = append(dst, tab[day*2], tab[day*2+1])
 			case 'D':
-				dst = appendTime(dst, "%m/%d/%y", t)
+				dst = AppendStrftime(dst, "%m/%d/%y", t)
 			case 'e':
 				if day >= 10 {
 					dst = append(dst, tab[day*2], tab[day*2+1])
@@ -220,7 +221,7 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 				tmp[0] = tab[b]
 				dst = append(dst, tmp[:]...)
 			case 'F':
-				dst = appendTime(dst, "%Y-%m-%d", t)
+				dst = AppendStrftime(dst, "%Y-%m-%d", t)
 			case 'G':
 				y, _ := t.ISOWeek()
 				a := y / 100 * 2
@@ -273,9 +274,9 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 					dst = append(dst, "pm"...)
 				}
 			case 'r':
-				dst = appendTime(dst, "%I:%M:%S %p", t)
+				dst = AppendStrftime(dst, "%I:%M:%S %p", t)
 			case 'R':
-				dst = appendTime(dst, "%H:%M", t)
+				dst = AppendStrftime(dst, "%H:%M", t)
 			case 's':
 				var tmp [10]byte
 				sec := t.Unix()
@@ -304,7 +305,7 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 			case 't':
 				dst = append(dst, '\t')
 			case 'T':
-				dst = appendTime(dst, "%H:%M:%S", t)
+				dst = AppendStrftime(dst, "%H:%M:%S", t)
 			case 'u':
 				dst = strconv.AppendInt(dst, int64(t.Weekday()+1), 10)
 			case 'U':
@@ -317,9 +318,9 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 			case 'W':
 				dst = strconv.AppendInt(dst, int64(((t.YearDay()-1)-int(t.Weekday()+6)%7+7)/7), 10)
 			case 'x':
-				dst = appendTime(dst, dateFormat, t)
+				dst = AppendStrftime(dst, dateFormat, t)
 			case 'X':
-				dst = appendTime(dst, timeFormat, t)
+				dst = AppendStrftime(dst, timeFormat, t)
 			case 'y':
 				a := year % 100 * 2
 				dst = append(dst, tab[a], tab[a+1])
