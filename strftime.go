@@ -3,6 +3,7 @@ package fasttime
 import (
 	"strconv"
 	"time"
+	"unsafe"
 )
 
 // Strftime formats time t using format.
@@ -47,6 +48,137 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 					dst = strconv.AppendInt(dst, int64(second), 10)
 				case 'j':
 					dst = strconv.AppendInt(dst, int64(t.YearDay()), 10)
+				}
+			case '_':
+				i++
+				if i == n {
+					return dst
+				}
+				switch format[i] {
+				case 'd':
+					if day < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(day), 10)
+				case 'm':
+					if month < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(month), 10)
+				case 'H':
+					if hour < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(hour), 10)
+				case 'I':
+					a := hour % 12
+					if a < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(a), 10)
+				case 'M':
+					if minute < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(minute), 10)
+				case 'S':
+					if second < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(second), 10)
+				case 'j':
+					if second < 100 {
+						dst = append(dst, ' ', ' ')
+					} else if second < 10 {
+						dst = append(dst, ' ')
+					}
+					dst = strconv.AppendInt(dst, int64(t.YearDay()), 10)
+				}
+			case '^':
+				i++
+				if i == n {
+					return dst
+				}
+				switch format[i] {
+				case 'a':
+					dst = appendUpper(dst, t.Weekday().String()[:3])
+				case 'A':
+					dst = appendUpper(dst, t.Weekday().String())
+				case 'b', 'h':
+					dst = appendUpper(dst, month.String()[:3])
+				case 'B':
+					dst = appendUpper(dst, month.String())
+				case 'p':
+					if hour <= 12 {
+						dst = append(dst, "am"...)
+					} else {
+						dst = append(dst, "pm"...)
+					}
+				case 'P':
+					if hour <= 12 {
+						dst = append(dst, "AM"...)
+					} else {
+						dst = append(dst, "PM"...)
+					}
+				case 'r':
+					dst = appendTime(dst, "%I:%M:%S ", t)
+					if hour <= 12 {
+						dst = append(dst, "am"...)
+					} else {
+						dst = append(dst, "pm"...)
+					}
+				case 'x':
+					b := appendTime(nil, dateFormat, t)
+					dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
+				case 'X':
+					b := appendTime(nil, timeFormat, t)
+					dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
+				case 'Z':
+					name, _ := t.Zone()
+					dst = appendUpper(dst, name)
+				}
+			case '#':
+				i++
+				if i == n {
+					return dst
+				}
+				switch format[i] {
+				case 'a':
+					dst = appendSwapcase(dst, t.Weekday().String()[:3])
+				case 'A':
+					dst = appendSwapcase(dst, t.Weekday().String())
+				case 'b', 'h':
+					dst = appendSwapcase(dst, month.String()[:3])
+				case 'B':
+					dst = appendSwapcase(dst, month.String())
+				case 'p':
+					if hour <= 12 {
+						dst = append(dst, "am"...)
+					} else {
+						dst = append(dst, "pm"...)
+					}
+				case 'P':
+					if hour <= 12 {
+						dst = append(dst, "AM"...)
+					} else {
+						dst = append(dst, "PM"...)
+					}
+				case 'r':
+					dst = appendTime(dst, "%I:%M:%S ", t)
+					if hour <= 12 {
+						dst = append(dst, "am"...)
+					} else {
+						dst = append(dst, "pm"...)
+					}
+				case 'x':
+					b := appendTime(nil, dateFormat, t)
+					dst = appendSwapcase(dst, *(*string)(unsafe.Pointer(&b)))
+				case 'X':
+					b := appendTime(nil, timeFormat, t)
+					dst = appendSwapcase(dst, *(*string)(unsafe.Pointer(&b)))
+				case 'Z':
+					name, _ := t.Zone()
+					dst = appendSwapcase(dst, name)
 				}
 			case 'a':
 				dst = append(dst, t.Weekday().String()[:3]...)
@@ -217,6 +349,29 @@ func appendTime(dst []byte, format string, t time.Time) []byte {
 		default:
 			dst = append(dst, c)
 		}
+	}
+	return dst
+}
+
+func appendUpper(dst []byte, s string) []byte {
+	for _, c := range []byte(s) {
+		if 'a' <= c && c <= 'z' {
+			c -= 'a' - 'A'
+		}
+		dst = append(dst, c)
+	}
+	return dst
+}
+
+func appendSwapcase(dst []byte, s string) []byte {
+	for _, c := range []byte(s) {
+		switch {
+		case 'A' <= c && c <= 'Z':
+			c += 'a' - 'A'
+		case 'a' <= c && c <= 'z':
+			c -= 'a' - 'A'
+		}
+		dst = append(dst, c)
 	}
 	return dst
 }
