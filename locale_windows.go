@@ -16,11 +16,19 @@ var dateFormat, timeFormat = func() (string, string) {
 	replacer := strings.NewReplacer(
 		"yyyy", "%Y",
 		"yy", "%y",
+		"MMMM", "%B",
 		"MM", "%m",
+		"M", "%-m",
+		"dddd", "%A",
 		"dd", "%d",
+		"d", "%-d",
 		"HH", "%H",
+		"H", "%-H",
+		"hh", "%I",
+		"h", "%-I",
 		"mm", "%M",
 		"ss", "%S",
+		"tt", "%P",
 	)
 
 	// open registry
