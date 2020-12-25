@@ -104,6 +104,7 @@ BenchmarkFasttime 	 3440578	       342 ns/op	       0 B/op	       0 allocs/op
 | `%T` | The time in 24-hour notation (%H:%M:%S). |
 | `%u` | The day of the week as a decimal, range 1 to 7, Monday being 1.  See also %w. |
 | `%U` | The week number of the current year as a decimal number, range 00 to 53, starting with the first Sunday as the first day of week 01.  See also %V and %W. |
+| `%v` | Equivalent to %e-%b-%Y. |
 | `%V` | The ISO 8601 week number (see NOTES) of the current year as a decimal number, range 01 to 53, where week 1 is the first week that has at least 4 days in the new year.  See also %U and %W. |
 | `%w` | The day of the week as a decimal, range 0 to 6, Sunday being 0.  See also %u. |
 | `%W` | The week number of the current year as a decimal number, range 00 to 53, starting with the first Monday as the first day of week 01. |

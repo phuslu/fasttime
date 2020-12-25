@@ -163,6 +163,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'V':
 			_, w := t.ISOWeek()
 			dst = append(dst, tab[w*2], tab[w*2+1])
+		case 'v':
+			dst = AppendStrftime(dst, "%e-%b-%Y", t)
 		case 'w':
 			dst = strconv.AppendInt(dst, int64(t.Weekday()), 10)
 		case 'W':
