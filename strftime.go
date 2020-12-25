@@ -196,6 +196,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			dst = append(dst, name...)
 		case '%':
 			dst = append(dst, '%')
+		case '+':
+			dst = AppendStrftime(dst, "%a %b %e %H:%M:%S %Z %Y", t)
 		case '-':
 			i++
 			if i == n {
