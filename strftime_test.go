@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var now = time.Date(2006, 1, 2, 15, 03, 04, 0, time.FixedZone("MST", -25200))
+var atime = time.Date(2006, 1, 2, 15, 03, 04, 0, time.FixedZone("MST", -25200))
 
 func TestStrftime(t *testing.T) {
 	cases := []struct {
@@ -56,20 +56,20 @@ func TestStrftime(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if got, want := Strftime(c.Format, now), c.Result; got != want {
-			t.Errorf("Strftime(%+v, %v) want=%v got=%v", c.Format, now, want, got)
+		if got, want := Strftime(c.Format, atime), c.Result; got != want {
+			t.Errorf("Strftime(%+v, %v) want=%v got=%v", c.Format, atime, want, got)
 		}
 	}
 }
 
 func BenchmarkStdTimeFormat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		now.Format("2006-01-02 15:04:05")
+		atime.Format("2006-01-02 15:04:05")
 	}
 }
 
 func BenchmarkFastTimeFormat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Strftime("%Y-%m-%d %H:%M:%S", now)
+		Strftime("%Y-%m-%d %H:%M:%S", atime)
 	}
 }

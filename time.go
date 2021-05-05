@@ -1,12 +1,20 @@
 package fasttime
 
+import (
+	_ "unsafe" // for time.now
+)
+
+//go:noescape
+//go:linkname now time.now
+func now() (sec int64, nsec int32, mono int64)
+
 // Timestamp formats unix timestamp.
 func Timestamp() string {
 	return string(timestamp(make([]byte, 10)))
 }
 
 func timestamp(b []byte) []byte {
-	sec, _ := walltime()
+	sec, _, _ := now()
 	a := sec % 100 * 2
 	sec /= 100
 	b[9] = tab[a+1]
@@ -35,7 +43,7 @@ func TimestampMS() string {
 }
 
 func timestampms(b []byte) []byte {
-	sec, nsec := walltime()
+	sec, nsec, _ := now()
 	ms := int64(nsec) / 1000000
 	a := ms % 100 * 2
 	b[12] = tab[a+1]
