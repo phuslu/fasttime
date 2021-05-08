@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	println(fasttime.Timestamp()))
 	println(fasttime.Strftime("%a %b %d %H:%M:%S %Z %Y", time.Now()))
 }
 
