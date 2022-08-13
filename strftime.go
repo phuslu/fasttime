@@ -188,7 +188,7 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 				a := (offset / 60) / 60 * 2
 				b := (offset / 60) % 60 * 2
 				dst = append(dst, '-', tab[a], tab[a+1], tab[b], tab[b+1])
-			case offset > 0:
+			case offset >= 0:
 				a := (offset / 60) / 60 * 2
 				b := (offset / 60) % 60 * 2
 				dst = append(dst, '+', tab[a], tab[a+1], tab[b], tab[b+1])
