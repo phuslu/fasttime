@@ -4,7 +4,7 @@
 
 ## Getting Started
 
-try on https://play.golang.org/p/wnb6G181qu6
+try on https://go.dev/play/p/wnb6G181qu6
 ```go
 package main
 
@@ -18,7 +18,6 @@ func main() {
 	println(fasttime.Strftime("%a %b %d %H:%M:%S %Z %Y", time.Now()))
 }
 
-// 1608220004
 // Thu Dec 17 10:49:04 +08 2020
 ```
 
@@ -63,9 +62,17 @@ func BenchmarkFasttime(b *testing.B) {
 ```
 
 ```
-BenchmarkLestrrat 	 2092376	       583 ns/op	      64 B/op	       1 allocs/op
-BenchmarkItchyny  	 2787598	       430 ns/op	       0 B/op	       0 allocs/op
-BenchmarkFasttime 	 3440578	       342 ns/op	       0 B/op	       0 allocs/op
+goos: linux
+goarch: amd64
+cpu: Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz
+BenchmarkLestrrat
+BenchmarkLestrrat-4   	 3107094	       426.8 ns/op	      64 B/op	       1 allocs/op
+BenchmarkItchyny
+BenchmarkItchyny-4    	 6291622	       188.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFasttime
+BenchmarkFasttime-4   	 9079492	       130.6 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	command-line-arguments	4.430s
 ```
 
 ## Supported formats:
