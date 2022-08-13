@@ -60,7 +60,7 @@ func BenchmarkFasttime(b *testing.B) {
 	}
 }
 ```
-
+A Performance result as below, for daily benchmark results see [github actions][benchmark]
 ```
 goos: linux
 goarch: amd64
@@ -131,3 +131,4 @@ ok  	command-line-arguments	4.430s
 [goreport]: https://goreportcard.com/report/github.com/phuslu/fasttime
 [coverage-img]: http://gocover.io/_badge/github.com/phuslu/fasttime
 [coverage]: https://gocover.io/github.com/phuslu/fasttime
+[benchmark]: https://github.com/phuslu/fasttime/actions/workflows/benchmark.yml?query=workflow%3Abenchmark
