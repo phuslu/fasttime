@@ -10,7 +10,7 @@ const (
 	RFC850     = "%A, %d-%b-%y %H:%M:%S %Z" // Monday, 02-Jan-06 15:04:05 MST
 	RFC1123    = "%a, %d %b %Y %H:%M:%S %Z" // Mon, 02 Jan 2006 15:04:05 MST
 	RFC1123Z   = "%a, %d %b %Y %H:%M:%S %z" // Mon, 02 Jan 2006 15:04:05 -0700
-	RFC3339    = "%Y-%m-%dT%H:%M:%S%^z"     // 2006-01-02T15:04:05Z07:00
+	RFC3339    = "%Y-%m-%dT%H:%M:%S%:z"     // 2006-01-02T15:04:05Z07:00
 	Kitchen    = "%-I:%M%p"                 // 3:04PM
 	Stamp      = "%b %e %H:%M:%S"           // Jan _2 15:04:05
 	StampMicro = "%b %e %H:%M:%S.%f"        // Jan _2 15:04:05.000000

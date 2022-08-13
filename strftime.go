@@ -305,21 +305,6 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'X':
 				b := AppendStrftime(nil, timeFormat, t)
 				dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
-			case 'z':
-				_, offset := t.Zone()
-				switch {
-				case offset == 0:
-					dst = append(dst, 'Z')
-				case offset < 0:
-					offset = -offset
-					a := (offset / 60) / 60 * 2
-					b := (offset / 60) % 60 * 2
-					dst = append(dst, '-', tab[a], tab[a+1], ':', tab[b], tab[b+1])
-				case offset > 0:
-					a := (offset / 60) / 60 * 2
-					b := (offset / 60) % 60 * 2
-					dst = append(dst, '+', tab[a], tab[a+1], ':', tab[b], tab[b+1])
-				}
 			case 'Z':
 				name, _ := t.Zone()
 				dst = appendUpper(dst, name)
@@ -366,6 +351,28 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'Z':
 				name, _ := t.Zone()
 				dst = appendSwapcase(dst, name)
+			}
+		case ':':
+			i++
+			if i == n {
+				return dst
+			}
+			switch format[i] {
+			case 'z':
+				_, offset := t.Zone()
+				switch {
+				case offset == 0:
+					dst = append(dst, 'Z')
+				case offset < 0:
+					offset = -offset
+					a := (offset / 60) / 60 * 2
+					b := (offset / 60) % 60 * 2
+					dst = append(dst, '-', tab[a], tab[a+1], ':', tab[b], tab[b+1])
+				case offset > 0:
+					a := (offset / 60) / 60 * 2
+					b := (offset / 60) % 60 * 2
+					dst = append(dst, '+', tab[a], tab[a+1], ':', tab[b], tab[b+1])
+				}
 			}
 		}
 	}
