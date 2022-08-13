@@ -41,6 +41,12 @@ const benchfmt = `%a %b %e %H:%M:%S %Z %Y`
 
 var now = time.Now()
 
+func BenchmarkStdTime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		now.Format("Mon Jan _2 15:04:05 MST 2006")
+	}
+}
+
 func BenchmarkLestrrat(b *testing.B) {
 	p, _ := lestrrat.New(benchfmt)
 	for i := 0; i < b.N; i++ {
@@ -64,15 +70,17 @@ A Performance result as below, for daily benchmark results see [github actions][
 ```
 goos: linux
 goarch: amd64
-cpu: Intel(R) Xeon(R) Silver 4216 CPU @ 2.10GHz
+cpu: Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz
+BenchmarkStdTime
+BenchmarkStdTime-4    	 2543314	       438.9 ns/op	      32 B/op	       1 allocs/op
 BenchmarkLestrrat
-BenchmarkLestrrat-4   	 3107094	       426.8 ns/op	      64 B/op	       1 allocs/op
+BenchmarkLestrrat-4   	 2055013	       598.2 ns/op	      64 B/op	       1 allocs/op
 BenchmarkItchyny
-BenchmarkItchyny-4    	 6291622	       188.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkItchyny-4    	 3510208	       344.7 ns/op	       0 B/op	       0 allocs/op
 BenchmarkFasttime
-BenchmarkFasttime-4   	 9079492	       130.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFasttime-4   	 4138840	       243.0 ns/op	       0 B/op	       0 allocs/op
 PASS
-ok  	command-line-arguments	4.430s
+ok  	command-line-arguments	6.326s
 ```
 
 ## Supported formats:
