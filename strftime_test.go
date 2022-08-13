@@ -60,6 +60,11 @@ func TestStrftime(t *testing.T) {
 			t.Errorf("Strftime(%+v, %v) want=%v got=%v", c.Format, atime, want, got)
 		}
 	}
+
+	u := atime.UTC()
+	if Strftime("%z", u) != "+0000" {
+		t.Errorf("%%z for UTC: %s", Strftime("%z", u))
+	}
 }
 
 func BenchmarkStdTimeFormat(b *testing.B) {
