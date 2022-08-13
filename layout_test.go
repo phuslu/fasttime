@@ -19,7 +19,7 @@ func TestLayout(t *testing.T) {
 		{RFC850, time.RFC850},
 		{RFC1123, time.RFC1123},
 		{RFC1123Z, time.RFC1123Z},
-		// {RFC3339, time.RFC3339},
+		{RFC3339, time.RFC3339},
 		{Kitchen, time.Kitchen},
 		{Stamp, time.Stamp},
 		{StampMicro, time.StampMicro},
