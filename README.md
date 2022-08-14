@@ -28,7 +28,7 @@ func main() {
 package strftime_test
 
 import (
-	"io/ioutil"
+	"io"
 	"testing"
 	"time"
 
@@ -50,7 +50,7 @@ func BenchmarkStdTime(b *testing.B) {
 func BenchmarkLestrrat(b *testing.B) {
 	p, _ := lestrrat.New(benchfmt)
 	for i := 0; i < b.N; i++ {
-		p.Format(ioutil.Discard, now)
+		p.Format(io.Discard, now)
 	}
 }
 
