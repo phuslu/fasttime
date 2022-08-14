@@ -37,50 +37,99 @@ import (
 	fasttime "github.com/phuslu/fasttime"
 )
 
-const benchfmt = `%a %b %e %H:%M:%S %Z %Y`
-
 var now = time.Now()
 
-func BenchmarkStdTime(b *testing.B) {
+func BenchmarkUnixDateStdTime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		now.Format("Mon Jan _2 15:04:05 MST 2006")
+		now.Format(time.UnixDate)
 	}
 }
 
-func BenchmarkLestrrat(b *testing.B) {
-	p, _ := lestrrat.New(benchfmt)
+func BenchmarkUnixDateLestrrat(b *testing.B) {
+	p, _ := lestrrat.New("%a %b %e %H:%M:%S %Z %Y")
 	for i := 0; i < b.N; i++ {
 		p.Format(io.Discard, now)
 	}
 }
 
-func BenchmarkItchyny(b *testing.B) {
+func BenchmarkUnixDateItchyny(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		itchyny.Format(now, benchfmt)
+		itchyny.Format(now, "%a %b %e %H:%M:%S %Z %Y")
 	}
 }
 
-func BenchmarkFasttime(b *testing.B) {
+func BenchmarkUnixDateFasttime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fasttime.Strftime(benchfmt, now)
+		fasttime.Strftime("%a %b %e %H:%M:%S %Z %Y", now)
+	}
+}
+
+func BenchmarkStampMicroStdTime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		now.Format(time.StampMicro)
+	}
+}
+
+func BenchmarkStampMicroLestrrat(b *testing.B) {
+	p, _ := lestrrat.New("%b %e %H:%M:%S.%f", lestrrat.WithMicroseconds('f'))
+	for i := 0; i < b.N; i++ {
+		p.Format(io.Discard, now)
+	}
+}
+
+func BenchmarkStampMicroItchyny(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		itchyny.Format(now, "%b %e %H:%M:%S.%f")
+	}
+}
+
+func BenchmarkStampMicroFasttime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		fasttime.Strftime("%b %e %H:%M:%S.%f", now)
+	}
+}
+
+func BenchmarkRFC3339StdTime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		now.Format(time.RFC3339)
+	}
+}
+
+func BenchmarkRFC3339Lestrrat(b *testing.B) {
+	p, _ := lestrrat.New("%Y-%m-%dT%H:%M:%S%z")
+	for i := 0; i < b.N; i++ {
+		p.Format(io.Discard, now)
+	}
+}
+
+func BenchmarkRFC3339Itchyny(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		itchyny.Format(now, "%Y-%m-%dT%H:%M:%S%:z")
+	}
+}
+
+func BenchmarkRFC3339Fasttime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		fasttime.Strftime("%Y-%m-%dT%H:%M:%S%:z", now)
 	}
 }
 ```
 A Performance result as below, for daily benchmark results see [github actions][benchmark]
 ```
-goos: linux
-goarch: amd64
-cpu: Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz
-BenchmarkStdTime
-BenchmarkStdTime-4    	 2543314	       438.9 ns/op	      32 B/op	       1 allocs/op
-BenchmarkLestrrat
-BenchmarkLestrrat-4   	 2055013	       598.2 ns/op	      64 B/op	       1 allocs/op
-BenchmarkItchyny
-BenchmarkItchyny-4    	 3510208	       344.7 ns/op	       0 B/op	       0 allocs/op
-BenchmarkFasttime
-BenchmarkFasttime-4   	 4138840	       243.0 ns/op	       0 B/op	       0 allocs/op
-PASS
-ok  	command-line-arguments	6.326s
+BenchmarkUnixDateStdTime-4      	 3134547	       359.0 ns/op	      32 B/op	       1 allocs/op
+BenchmarkUnixDateLestrrat-4     	 2445044	       505.8 ns/op	      64 B/op	       1 allocs/op
+BenchmarkUnixDateItchyny-4      	 3726554	       316.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnixDateFasttime-4     	 4719768	       245.8 ns/op	       0 B/op	       0 allocs/op
+
+BenchmarkStampMicroStdTime-4    	 3793047	       318.8 ns/op	      24 B/op	       1 allocs/op
+BenchmarkStampMicroLestrrat-4   	 2409372	       477.2 ns/op	      72 B/op	       2 allocs/op
+BenchmarkStampMicroItchyny-4    	 4752626	       242.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStampMicroFasttime-4   	 7268750	       164.2 ns/op	       0 B/op	       0 allocs/op
+
+BenchmarkRFC3339StdTime-4       	 3563881	       336.0 ns/op	      24 B/op	       1 allocs/op
+BenchmarkRFC3339Lestrrat-4      	 2520579	       480.9 ns/op	      64 B/op	       1 allocs/op
+BenchmarkRFC3339Itchyny-4       	 4386028	       273.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	       0 allocs/op
 ```
 
 ## Supported formats:
