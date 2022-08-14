@@ -145,6 +145,7 @@ BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	     
 | `%d` | The day of the month as a decimal number (range 01 to 31). |
 | `%D` | Equivalent to %m/%d/%y.  (Yecch—for Americans only.) |
 | `%e` | Like %d, the day of the month as a decimal number, but a leading zero is replaced by a space. |
+| `%f` | Microsecond as a decimal number, zero-padded on the left. |
 | `%F` | Equivalent to %Y-%m-%d (the ISO 8601 date format). |
 | `%G` | The  ISO 8601 week-based year (see NOTES) with century as a decimal number.  The 4-digit year corresponding to the ISO week number (see %V).  This has the same format and value as %Y, except that if the ISO week number belongs to the previous or next year, that year is used instead. |
 | `%g` | Like %G, but without century, that is, with a 2-digit year (00-99). |
@@ -157,8 +158,10 @@ BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	     
 | `%m` | The month as a decimal number (range 01 to 12). |
 | `%M` | The minute as a decimal number (range 00 to 59). |
 | `%n` | A newline character. |
+| `%N` | Nanosecond as a decimal number, zero-padded on the left. |
 | `%p` | Either "AM" or "PM" according to the given time value, or the corresponding strings for the current locale.  Noon is treated as "PM" and midnight as "AM". |
 | `%P` | Like %p but in lowercase: "am" or "pm" or a corresponding string for the current locale. |
+| `%Q` | Millisecond as a decimal number, zero-padded on the left. |
 | `%r` | The time in a.m. or p.m. notation.  In the POSIX locale this is equivalent to %I:%M:%S %p. |
 | `%R` | The time in 24-hour notation (%H:%M). For a version including the seconds, see %T below. |
 | `%s` | The number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC). |

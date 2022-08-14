@@ -20,9 +20,13 @@ func TestLayout(t *testing.T) {
 		{RFC1123, time.RFC1123},
 		{RFC1123Z, time.RFC1123Z},
 		{RFC3339, time.RFC3339},
+		// {RFC3339Nano, time.RFC3339Nano},
+		{RFC3339Nano, "2006-01-02T15:04:05.000000000Z07:00"},
 		{Kitchen, time.Kitchen},
 		{Stamp, time.Stamp},
+		{StampMilli, time.StampMilli},
 		{StampMicro, time.StampMicro},
+		{StampNano, time.StampNano},
 	}
 
 	now := time.Now()

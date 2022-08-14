@@ -116,6 +116,26 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			dst = append(dst, tab[minute*2], tab[minute*2+1])
 		case 'n':
 			dst = append(dst, '\n')
+		case 'N':
+			var tmp [9]byte
+			a := t.Nanosecond()
+			b := a % 100 * 2
+			tmp[8] = tab[b+1]
+			tmp[7] = tab[b]
+			a /= 100
+			b = a % 100 * 2
+			tmp[6] = tab[b+1]
+			tmp[5] = tab[b]
+			a /= 100
+			b = a % 100 * 2
+			tmp[4] = tab[b+1]
+			tmp[3] = tab[b]
+			a /= 100
+			b = a % 100 * 2
+			tmp[2] = tab[b+1]
+			tmp[1] = tab[b]
+			tmp[0] = byte(a/100) + '0'
+			dst = append(dst, tmp[:]...)
 		case 'O':
 			panic("not implemented")
 		case 'p':
@@ -130,6 +150,10 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			} else {
 				dst = append(dst, "pm"...)
 			}
+		case 'Q':
+			a := t.Nanosecond() / 1000000
+			b := a % 100 * 2
+			dst = append(dst, byte(a/100)+'0', tab[b], tab[b+1])
 		case 'r':
 			dst = AppendStrftime(dst, "%I:%M:%S %p", t)
 		case 'R':
