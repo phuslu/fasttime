@@ -84,10 +84,11 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'H':
 			dst = append(dst, tab[hour*2], tab[hour*2+1])
 		case 'I':
-			a := hour % 12 * 2
+			a := hour % 12
 			if a == 0 {
 				a = 12
 			}
+			a *= 2
 			dst = append(dst, tab[a], tab[a+1])
 		case 'j':
 			a := t.YearDay() / 100
@@ -219,7 +220,11 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'H':
 				dst = strconv.AppendInt(dst, int64(hour), 10)
 			case 'I':
-				dst = strconv.AppendInt(dst, int64(hour%12), 10)
+				a := hour % 12
+				if hour == 0 {
+					a = 12
+				}
+				dst = strconv.AppendInt(dst, int64(a), 10)
 			case 'M':
 				dst = strconv.AppendInt(dst, int64(minute), 10)
 			case 'S':
