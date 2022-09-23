@@ -151,8 +151,10 @@ BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	     
 | `%g` | Like %G, but without century, that is, with a 2-digit year (00-99). |
 | `%h` | Equivalent to %b. |
 | `%H` | The hour as a decimal number using a 24-hour clock (range 00 to 23). |
+| `%i` | '.' + Microsecond as a decimal number, trailing zeros dropped. |
 | `%I` | The hour as a decimal number using a 12-hour clock (range 01 to 12). |
 | `%j` | The day of the year as a decimal number (range 001 to 366). |
+| `%J` | '.' + Nanosecond as a decimal number, trailing zeros dropped. |
 | `%k` | The hour (24-hour clock) as a decimal number (range 0 to 23); single digits are preceded by a blank.  (See also %H.)  |
 | `%l` | The hour (12-hour clock) as a decimal number (range 1 to 12); single digits are preceded by a blank.  (See also %I.)  |
 | `%m` | The month as a decimal number (range 01 to 12). |
@@ -161,6 +163,7 @@ BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	     
 | `%N` | Nanosecond as a decimal number, zero-padded on the left. |
 | `%p` | Either "AM" or "PM" according to the given time value, or the corresponding strings for the current locale.  Noon is treated as "PM" and midnight as "AM". |
 | `%P` | Like %p but in lowercase: "am" or "pm" or a corresponding string for the current locale. |
+| `%q` | '.' + Millisecond as a decimal number, trailing zeros dropped. |
 | `%Q` | Millisecond as a decimal number, zero-padded on the left. |
 | `%r` | The time in a.m. or p.m. notation.  In the POSIX locale this is equivalent to %I:%M:%S %p. |
 | `%R` | The time in 24-hour notation (%H:%M). For a version including the seconds, see %T below. |
