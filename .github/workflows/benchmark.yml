@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.18'
+          go-version: '1.27'
           check-latest: true
       - name: Benchmark
         run: |

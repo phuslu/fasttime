@@ -1,10 +1,10 @@
 # fasttime - fast time formatting for go
 
-[![godoc][godoc-img]][godoc] [![release][release-img]][release] [![goreport][goreport-img]][goreport] [![coverage][coverage-img]][coverage]
+[![godoc][godoc-img]][godoc] [![release][release-img]][release]
 
 ## Getting Started
 
-try on https://go.dev/play/p/wnb6G181qu6
+try on https://go.dev/play/p/AijJdoqJH6F
 ```go
 package main
 
@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	println(fasttime.Strftime("%a %b %d %H:%M:%S %Z %Y", time.Now()))
+	println(fasttime.Strftime("%a %b %d %H:%M:%S %Z %Y", fasttime.Now()))
 }
 
 // Thu Dec 17 10:49:04 +08 2020
@@ -37,99 +37,105 @@ import (
 	fasttime "github.com/phuslu/fasttime"
 )
 
-var now = time.Now()
-
 func BenchmarkUnixDateStdTime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		now.Format(time.UnixDate)
+		time.Now().Format(time.UnixDate)
 	}
 }
 
 func BenchmarkUnixDateLestrrat(b *testing.B) {
 	p, _ := lestrrat.New("%a %b %e %H:%M:%S %Z %Y")
 	for i := 0; i < b.N; i++ {
-		p.Format(io.Discard, now)
+		p.Format(io.Discard, time.Now())
 	}
 }
 
 func BenchmarkUnixDateItchyny(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		itchyny.Format(now, "%a %b %e %H:%M:%S %Z %Y")
+		itchyny.Format(time.Now(), "%a %b %e %H:%M:%S %Z %Y")
 	}
 }
 
 func BenchmarkUnixDateFasttime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fasttime.Strftime("%a %b %e %H:%M:%S %Z %Y", now)
+		fasttime.Strftime("%a %b %e %H:%M:%S %Z %Y", fasttime.Now())
 	}
 }
 
 func BenchmarkStampMicroStdTime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		now.Format(time.StampMicro)
+		time.Now().Format(time.StampMicro)
 	}
 }
 
 func BenchmarkStampMicroLestrrat(b *testing.B) {
 	p, _ := lestrrat.New("%b %e %H:%M:%S.%f", lestrrat.WithMicroseconds('f'))
 	for i := 0; i < b.N; i++ {
-		p.Format(io.Discard, now)
+		p.Format(io.Discard, time.Now())
 	}
 }
 
 func BenchmarkStampMicroItchyny(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		itchyny.Format(now, "%b %e %H:%M:%S.%f")
+		itchyny.Format(time.Now(), "%b %e %H:%M:%S.%f")
 	}
 }
 
 func BenchmarkStampMicroFasttime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fasttime.Strftime("%b %e %H:%M:%S.%f", now)
+		fasttime.Strftime("%b %e %H:%M:%S.%f", fasttime.Now())
 	}
 }
 
 func BenchmarkRFC3339StdTime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		now.Format(time.RFC3339)
+		time.Now().Format(time.RFC3339)
 	}
 }
 
 func BenchmarkRFC3339Lestrrat(b *testing.B) {
 	p, _ := lestrrat.New("%Y-%m-%dT%H:%M:%S%z")
 	for i := 0; i < b.N; i++ {
-		p.Format(io.Discard, now)
+		p.Format(io.Discard, time.Now())
 	}
 }
 
 func BenchmarkRFC3339Itchyny(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		itchyny.Format(now, "%Y-%m-%dT%H:%M:%S%:z")
+		itchyny.Format(time.Now(), "%Y-%m-%dT%H:%M:%S%:z")
 	}
 }
 
 func BenchmarkRFC3339Fasttime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		fasttime.Strftime("%Y-%m-%dT%H:%M:%S%:z", now)
+		fasttime.Strftime("%Y-%m-%dT%H:%M:%S%:z", fasttime.Now())
 	}
 }
 ```
 A Performance result as below, for daily benchmark results see [github actions][benchmark]
 ```
-BenchmarkUnixDateStdTime-4      	 3134547	       359.0 ns/op	      32 B/op	       1 allocs/op
-BenchmarkUnixDateLestrrat-4     	 2445044	       505.8 ns/op	      64 B/op	       1 allocs/op
-BenchmarkUnixDateItchyny-4      	 3726554	       316.0 ns/op	       0 B/op	       0 allocs/op
-BenchmarkUnixDateFasttime-4     	 4719768	       245.8 ns/op	       0 B/op	       0 allocs/op
+goos: linux
+goarch: amd64
+cpu: AMD EPYC 9V45 96-Core Processor
 
-BenchmarkStampMicroStdTime-4    	 3793047	       318.8 ns/op	      24 B/op	       1 allocs/op
-BenchmarkStampMicroLestrrat-4   	 2409372	       477.2 ns/op	      72 B/op	       2 allocs/op
-BenchmarkStampMicroItchyny-4    	 4752626	       242.8 ns/op	       0 B/op	       0 allocs/op
-BenchmarkStampMicroFasttime-4   	 7268750	       164.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnixDateStdTime-4      	10701882	       112.7 ns/op	      32 B/op	       1 allocs/op
+BenchmarkStampMicroStdTime-4    	11141518	       106.0 ns/op	      24 B/op	       1 allocs/op
+BenchmarkRFC3339StdTime-4       	17818087	        66.67 ns/op	      24 B/op	       1 allocs/op
 
-BenchmarkRFC3339StdTime-4       	 3563881	       336.0 ns/op	      24 B/op	       1 allocs/op
-BenchmarkRFC3339Lestrrat-4      	 2520579	       480.9 ns/op	      64 B/op	       1 allocs/op
-BenchmarkRFC3339Itchyny-4       	 4386028	       273.3 ns/op	       0 B/op	       0 allocs/op
-BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnixDateLestrrat-4     	10392775	       114.6 ns/op	      64 B/op	       1 allocs/op
+BenchmarkStampMicroLestrrat-4   	10082067	       116.4 ns/op	      71 B/op	       1 allocs/op
+BenchmarkRFC3339Lestrrat-4      	10662012	       109.4 ns/op	      64 B/op	       1 allocs/op
+
+BenchmarkUnixDateItchyny-4      	13131385	        91.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStampMicroItchyny-4    	14089012	        84.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRFC3339Itchyny-4       	14729580	        81.61 ns/op	       0 B/op	       0 allocs/op
+
+BenchmarkUnixDateFasttime-4     	22288356	        53.45 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStampMicroFasttime-4   	24917317	        48.09 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRFC3339Fasttime-4      	26290786	        47.17 ns/op	       0 B/op	       0 allocs/op
+
+PASS
+ok  	command-line-arguments	15.400s
 ```
 
 ## Supported formats:
@@ -187,8 +193,4 @@ BenchmarkRFC3339Fasttime-4      	 6393230	       189.1 ns/op	       0 B/op	     
 [godoc]: https://godoc.org/github.com/phuslu/fasttime
 [release-img]: https://img.shields.io/github/v/tag/phuslu/fasttime?label=release
 [release]: https://github.com/phuslu/fasttime/releases
-[goreport-img]: https://goreportcard.com/badge/github.com/phuslu/fasttime
-[goreport]: https://goreportcard.com/report/github.com/phuslu/fasttime
-[coverage-img]: http://gocover.io/_badge/github.com/phuslu/fasttime
-[coverage]: https://gocover.io/github.com/phuslu/fasttime
 [benchmark]: https://github.com/phuslu/fasttime/actions/workflows/benchmark.yml?query=workflow%3Abenchmark
