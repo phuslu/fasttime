@@ -57,8 +57,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'E':
 			panic("not implemented")
 		case 'f':
-			var tmp [6]byte
 			a := t.Nanosecond() / 1000
+			var tmp [6]byte
 			b := a % 100 * 2
 			tmp[5] = tab[b+1]
 			tmp[4] = tab[b]
@@ -83,6 +83,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			dst = append(dst, tab[a], tab[a+1])
 		case 'H':
 			dst = append(dst, tab[hour*2], tab[hour*2+1])
+		case 'i':
+			dst = significantOnly(dst, t.Nanosecond()/int(time.Microsecond), 6)
 		case 'I':
 			a := hour % 12
 			if a == 0 {
@@ -94,6 +96,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			a := t.YearDay() / 100
 			b := t.YearDay() % 100 * 2
 			dst = append(dst, byte(a)+'0', tab[b], tab[b+1])
+		case 'J':
+			dst = significantOnly(dst, t.Nanosecond(), 9)
 		case 'k':
 			if hour >= 10 {
 				dst = append(dst, tab[hour*2], tab[hour*2+1])
@@ -150,6 +154,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			} else {
 				dst = append(dst, "pm"...)
 			}
+		case 'q':
+			dst = significantOnly(dst, t.Nanosecond()/int(time.Millisecond), 3)
 		case 'Q':
 			a := t.Nanosecond() / 1000000
 			b := a % 100 * 2
@@ -415,6 +421,101 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		}
 	}
 	return dst
+}
+
+func significantOnly(dst []byte, a, digits int) []byte {
+	if a == 0 {
+		return dst
+	}
+	for digits > 3 && a%1000 == 0 {
+		a /= 1000
+		digits -= 3
+	}
+	// at most two more digits to remove
+	if a%10 == 0 {
+		a /= 10
+		digits--
+		if a%10 == 0 {
+			a /= 10
+			digits--
+		}
+	}
+	switch digits {
+	case 9:
+		var tmp [10]byte
+		b := a % 100 * 2
+		tmp[8], tmp[9] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[6], tmp[7] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[4], tmp[5] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2], tmp[3] = '.', byte(a/100)+'0', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 8:
+		var tmp [9]byte
+		b := a % 100 * 2
+		tmp[7], tmp[8] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[5], tmp[6] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[3], tmp[4] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2] = '.', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 7:
+		var tmp [8]byte
+		b := a % 100 * 2
+		tmp[6], tmp[7] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[4], tmp[5] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2], tmp[3] = '.', byte(a/100)+'0', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 6:
+		var tmp [7]byte
+		b := a % 100 * 2
+		tmp[5], tmp[6] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[3], tmp[4] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2] = '.', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 5:
+		var tmp [6]byte
+		b := a % 100 * 2
+		tmp[4], tmp[5] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2], tmp[3] = '.', byte(a/100)+'0', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 4:
+		var tmp [5]byte
+		b := a % 100 * 2
+		tmp[3], tmp[4] = tab[b], tab[b+1]
+		a /= 100
+		b = a % 100 * 2
+		tmp[0], tmp[1], tmp[2] = '.', tab[b], tab[b+1]
+		return append(dst, tmp[:]...)
+	case 3:
+		b := a % 100 * 2
+		return append(dst, '.', byte(a/100)+'0', tab[b], tab[b+1])
+	case 2:
+		b := a * 2
+		return append(dst, '.', tab[b], tab[b+1])
+	default:
+		return append(dst, '.', byte(a)+'0')
+	}
 }
 
 func appendUpper(dst []byte, s string) []byte {
