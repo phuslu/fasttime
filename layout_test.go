@@ -20,10 +20,9 @@ func TestLayout(t *testing.T) {
 		{RFC1123, time.RFC1123},
 		{RFC1123Z, time.RFC1123Z},
 		{RFC3339, time.RFC3339},
-		{RFC3339Milli, "2006-01-02T15:04:05.000Z07:00"},
-		{RFC3339Micro, "2006-01-02T15:04:05.000000Z07:00"},
-		{RFC3339Nano, "2006-01-02T15:04:05.000000000Z07:00"},
-		// {RFC3339Nano, time.RFC3339Nano},
+		{RFC3339Milli, "2006-01-02T15:04:05.999Z07:00"},
+		{RFC3339Micro, "2006-01-02T15:04:05.999999Z07:00"},
+		{RFC3339Nano, time.RFC3339Nano},
 		{Kitchen, time.Kitchen},
 		{Stamp, time.Stamp},
 		{StampMilli, time.StampMilli},
@@ -34,8 +33,11 @@ func TestLayout(t *testing.T) {
 	now := time.Now()
 
 	for _, c := range cases {
-		if got, want := Strftime(c.Layout, now), now.Format(c.StdLayout); got != want {
-			t.Errorf("Strftime(%#v, %#v) want=%v got=%v", c.Layout, atime, want, got)
+		for _, rounding := range []time.Duration{time.Nanosecond, time.Nanosecond * 10, time.Nanosecond * 100, time.Microsecond, time.Microsecond * 10, time.Microsecond * 100, time.Millisecond, time.Millisecond * 10, time.Millisecond * 100, time.Second, time.Minute} {
+			now := now.Round(rounding)
+			if got, want := Strftime(c.Layout, now), now.Format(c.StdLayout); got != want {
+				t.Errorf("Strftime(%#v, %#v) want=%v got=%v", c.Layout, atime, want, got)
+			}
 		}
 	}
 }
