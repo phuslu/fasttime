@@ -20,6 +20,8 @@ var dateFormat, timeFormat = func() (string, string) {
 	}
 
 	switch lang {
+	case "", "C", "POSIX":
+		return "%m/%d/%y", "%H:%M:%S"
 	case "en_AG":
 		return "%d/%m/%y", "%H:%M:%S"
 	case "en_AU":
