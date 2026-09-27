@@ -28,8 +28,10 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		}
 		i++
 		if i == n {
-			return dst
+			// Like C, a trailing % is copied through.
+			return append(dst, '%')
 		}
+	conversion:
 		switch format[i] {
 		case 'a':
 			dst = append(dst, t.Weekday().String()[:3]...)
@@ -54,8 +56,14 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			} else {
 				dst = append(dst, ' ', tab[day*2+1])
 			}
-		case 'E':
-			panic("not implemented")
+		case 'E', 'O':
+			// The E and O modifiers select a locale's alternative
+			// representation, which the C locale does not have.
+			i++
+			if i == n {
+				return append(dst, '%', format[n-1])
+			}
+			goto conversion
 		case 'f':
 			var tmp [6]byte
 			a := t.Nanosecond() / 1000
@@ -136,16 +144,14 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			tmp[1] = tab[b]
 			tmp[0] = byte(a/100) + '0'
 			dst = append(dst, tmp[:]...)
-		case 'O':
-			panic("not implemented")
 		case 'p':
-			if hour <= 12 {
+			if hour < 12 {
 				dst = append(dst, "AM"...)
 			} else {
 				dst = append(dst, "PM"...)
 			}
 		case 'P':
-			if hour <= 12 {
+			if hour < 12 {
 				dst = append(dst, "am"...)
 			} else {
 				dst = append(dst, "pm"...)
@@ -159,8 +165,13 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'R':
 			dst = AppendStrftime(dst, "%H:%M", t)
 		case 's':
-			var tmp [10]byte
 			sec := t.Unix()
+			if sec < 1e9 || sec >= 1e10 {
+				// Only ten digit timestamps (2001 to 2286) take the table.
+				dst = strconv.AppendInt(dst, sec, 10)
+				break
+			}
+			var tmp [10]byte
 			is := sec % 100 * 2
 			sec /= 100
 			tmp[9] = tab[is+1]
@@ -188,9 +199,14 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'T':
 			dst = AppendStrftime(dst, "%H:%M:%S", t)
 		case 'u':
-			dst = strconv.AppendInt(dst, int64(t.Weekday()+1), 10)
+			if w := t.Weekday(); w == time.Sunday {
+				dst = append(dst, '7')
+			} else {
+				dst = append(dst, byte(w)+'0')
+			}
 		case 'U':
-			dst = strconv.AppendInt(dst, int64(((t.YearDay()-1)-int(t.Weekday()+6)%7+7)/7)+1, 10)
+			a := (t.YearDay() + 6 - int(t.Weekday())) / 7 * 2
+			dst = append(dst, tab[a], tab[a+1])
 		case 'V':
 			_, w := t.ISOWeek()
 			dst = append(dst, tab[w*2], tab[w*2+1])
@@ -199,7 +215,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 		case 'w':
 			dst = strconv.AppendInt(dst, int64(t.Weekday()), 10)
 		case 'W':
-			dst = strconv.AppendInt(dst, int64(((t.YearDay()-1)-int(t.Weekday()+6)%7+7)/7), 10)
+			a := (t.YearDay() + 6 - (int(t.Weekday())+6)%7) / 7 * 2
+			dst = append(dst, tab[a], tab[a+1])
 		case 'x':
 			dst = AppendStrftime(dst, dateFormat, t)
 		case 'X':
@@ -245,7 +262,7 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 				dst = strconv.AppendInt(dst, int64(hour), 10)
 			case 'I':
 				a := hour % 12
-				if hour == 0 {
+				if a == 0 {
 					a = 12
 				}
 				dst = strconv.AppendInt(dst, int64(a), 10)
@@ -255,6 +272,8 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 				dst = strconv.AppendInt(dst, int64(second), 10)
 			case 'j':
 				dst = strconv.AppendInt(dst, int64(t.YearDay()), 10)
+			default:
+				dst = AppendStrftime(dst, "%"+string(format[i]), t)
 			}
 		case '_':
 			i++
@@ -297,12 +316,14 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 				}
 				dst = strconv.AppendInt(dst, int64(second), 10)
 			case 'j':
-				if second < 100 {
+				if yday := t.YearDay(); yday < 10 {
 					dst = append(dst, ' ', ' ')
-				} else if second < 10 {
+				} else if yday < 100 {
 					dst = append(dst, ' ')
 				}
 				dst = strconv.AppendInt(dst, int64(t.YearDay()), 10)
+			default:
+				dst = AppendStrftime(dst, "%"+string(format[i]), t)
 			}
 		case '^':
 			i++
@@ -319,20 +340,20 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'B':
 				dst = appendUpper(dst, month.String())
 			case 'p':
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "am"...)
 				} else {
 					dst = append(dst, "pm"...)
 				}
 			case 'P':
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "AM"...)
 				} else {
 					dst = append(dst, "PM"...)
 				}
 			case 'r':
 				dst = AppendStrftime(dst, "%I:%M:%S ", t)
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "am"...)
 				} else {
 					dst = append(dst, "pm"...)
@@ -346,6 +367,9 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'Z':
 				name, _ := t.Zone()
 				dst = appendUpper(dst, name)
+			default:
+				b := AppendStrftime(nil, "%"+string(format[i]), t)
+				dst = appendUpper(dst, *(*string)(unsafe.Pointer(&b)))
 			}
 		case '#':
 			i++
@@ -362,20 +386,20 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'B':
 				dst = appendSwapcase(dst, month.String())
 			case 'p':
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "am"...)
 				} else {
 					dst = append(dst, "pm"...)
 				}
 			case 'P':
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "AM"...)
 				} else {
 					dst = append(dst, "PM"...)
 				}
 			case 'r':
 				dst = AppendStrftime(dst, "%I:%M:%S ", t)
-				if hour <= 12 {
+				if hour < 12 {
 					dst = append(dst, "am"...)
 				} else {
 					dst = append(dst, "pm"...)
@@ -389,6 +413,27 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 			case 'Z':
 				name, _ := t.Zone()
 				dst = appendSwapcase(dst, name)
+			default:
+				dst = AppendStrftime(dst, "%"+string(format[i]), t)
+			}
+		case '0':
+			i++
+			if i == n {
+				return dst
+			}
+			switch format[i] {
+			case 'e':
+				dst = append(dst, tab[day*2], tab[day*2+1])
+			case 'k':
+				dst = append(dst, tab[hour*2], tab[hour*2+1])
+			case 'l':
+				a := hour % 12
+				if a == 0 {
+					a = 12
+				}
+				dst = append(dst, tab[a*2], tab[a*2+1])
+			default:
+				dst = AppendStrftime(dst, "%"+string(format[i]), t)
 			}
 		case ':':
 			i++
@@ -411,7 +456,12 @@ func AppendStrftime(dst []byte, format string, t time.Time) []byte {
 					b := (offset / 60) % 60 * 2
 					dst = append(dst, '+', tab[a], tab[a+1], ':', tab[b], tab[b+1])
 				}
+			default:
+				dst = append(dst, '%', ':', format[i])
 			}
+		default:
+			// Like C, an unknown conversion is copied through.
+			dst = append(dst, '%', format[i])
 		}
 	}
 	return dst

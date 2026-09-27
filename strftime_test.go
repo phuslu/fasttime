@@ -41,11 +41,11 @@ func TestStrftime(t *testing.T) {
 		{"%S", "04"},
 		{"%t", "\t"},
 		{"%T", "15:03:04"},
-		// {"%u", "1"},
-		// {"%U", "01"},
+		{"%u", "1"},
+		{"%U", "01"},
 		{"%V", "01"},
 		{"%w", "1"},
-		// {"%W", "01"},
+		{"%W", "01"},
 		// {"%x", "02/01/2006"},
 		// {"%X", "15:03:04"},
 		{"%y", "06"},
@@ -76,5 +76,19 @@ func BenchmarkStdTimeFormat(b *testing.B) {
 func BenchmarkFastTimeFormat(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Strftime("%Y-%m-%d %H:%M:%S", atime)
+	}
+}
+
+func BenchmarkFastTimeFormatUnixDate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Strftime(UnixDate, atime)
+	}
+}
+
+func BenchmarkFastTimeFormatAll(b *testing.B) {
+	const format = "%a %A %b %B %c %C %d %D %e %F %g %G %H %I %j %k %l %m %M %p %P %r %R %s %S %T %u %U %V %w %W %y %Y %z %Z %% %-d %_H %^a %#b %:z"
+	dst := make([]byte, 0, 512)
+	for i := 0; i < b.N; i++ {
+		dst = AppendStrftime(dst[:0], format, atime)
 	}
 }
